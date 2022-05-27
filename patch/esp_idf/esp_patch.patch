@@ -1,0 +1,20 @@
+diff --git a/components/esp_rom/include/esp32/rom/ets_sys.h b/components/esp_rom/include/esp32/rom/ets_sys.h
+index 3485f0d406..ee224b1c62 100644
+--- a/components/esp_rom/include/esp32/rom/ets_sys.h
++++ b/components/esp_rom/include/esp32/rom/ets_sys.h
+@@ -635,6 +635,7 @@ void intr_matrix_set(int cpu_no, uint32_t model_num, uint32_t intr_num);
+
+ #define ETS_MEM_BAR() asm volatile ( "" : : : "memory" )
+
++#ifndef STATUS
+ typedef enum {
+     OK = 0,
+     FAIL,
+@@ -642,6 +643,7 @@ typedef enum {
+     BUSY,
+     CANCEL,
+ } STATUS;
++#endif
+
+ /**
+   * @}

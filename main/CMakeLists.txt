@@ -1,5 +1,5 @@
 option(ENABLE_STREAMING "enable the streaming" ON)
-option(ENABLE_DATA_CHANNEL "enable the data channel" ON)
+option(ENABLE_DATA_CHANNEL "enable the data channel" OFF)
 
 set(LIB_SOURCE_DIR "${CMAKE_SOURCE_DIR}/main/lib")
 

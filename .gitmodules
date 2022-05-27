@@ -1,12 +1,16 @@
 [submodule "main/lib/libsrtp"]
 	path = main/lib/libsrtp
 	url = https://github.com/cisco/libsrtp.git
+	ignore = all
 [submodule "main/lib/amazon-kinesis-video-streams-webrtc-sdk-c"]
 	path = main/lib/amazon-kinesis-video-streams-webrtc-sdk-c
 	url = https://github.com/iotlabtpe/amazon-kinesis-video-streams-webrtc-sdk-c.git
+	ignore = all
 [submodule "main/lib/wslay"]
 	path = main/lib/wslay
 	url = https://github.com/tatsuhiro-t/wslay.git
+    ignore = all
 [submodule "main/lib/usrsctp"]
 	path = main/lib/usrsctp
 	url = https://github.com/sctplab/usrsctp.git
+    ignore = all
