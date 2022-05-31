@@ -26,25 +26,24 @@ set(LIBKVSWEBRTC_INCLUDE_DIRS "${LIB_SOURCE_DIR}/${LIBKVSWEBRTC_NAME}/src/includ
 
 set(OPEN_SRC_INCLUDE_DIRS "${LIBKVSWEBRTC_INCLUDE_DIRS}")
 set(APP_INCLUDE_DIRS "./include")
-idf_component_register(SRCS "kvswebrtc_example_main.c"
-                            "AppCommon.c"
-                            "AppCredential.c"
-                            "AppDataChannel.c"
-                            "AppMediaSrc_ESP32_FileSrc.c"
-                            "AppMain.c"
-                            "AppMessageQueue.c"
-                            "AppMetrics.c"
-                            "AppSignaling.c"
-                            "AppWebRTC.c"
+file(GLOB APP_SRCS ./*.c)
+idf_component_register(SRCS ${APP_SRCS}
                     INCLUDE_DIRS "." "${OPEN_SRC_INCLUDE_DIRS}" "${APP_INCLUDE_DIRS}"
                     REQUIRES nvs_flash mbedtls lwip fatfs esp_common pthread
                     )
-
 
 idf_component_get_property(nvs_flash_lib nvs_flash COMPONENT_LIB)
 idf_component_get_property(mbedtls_lib mbedtls COMPONENT_LIB)
 idf_component_get_property(esp_common_lib esp_common COMPONENT_LIB)
 idf_component_get_property(pthread_lib pthread COMPONENT_LIB)
+
+# Comment/uncomment the following line to control whether or not the project uses an SD Card or the frames stored internally
+# set(USE_SD_CARD "ON")
+if(DEFINED USE_SD_CARD)
+        component_compile_options(
+                -DUSE_SD_CARD=1
+        )
+endif()
 
 set(KVS_PLAT_ESP_FREERTOS ON CACHE BOOL "Build for ESP FreeRTOS")
 add_definitions(-DKVS_PLAT_ESP_FREERTOS)

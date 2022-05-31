@@ -17,7 +17,13 @@
 #include "AppCommon.h"
 #include "fileio.h"
 
-#define NUMBER_OF_H264_FRAME_FILES               1500
+// *****************************************************************************
+#ifndef USE_SD_CARD
+#include "frames.h"
+#endif
+// *****************************************************************************
+
+#define NUMBER_OF_H264_FRAME_FILES               100 // 1500
 #define NUMBER_OF_OPUS_FRAME_FILES               618
 #define DEFAULT_FPS_VALUE                        25
 
@@ -100,12 +106,18 @@ PVOID sendVideoPackets(PVOID args)
 
     while (!ATOMIC_LOAD_BOOL(&pFileSrcContext->shutdownFileSrc)) {
         fileIndex = fileIndex % NUMBER_OF_H264_FRAME_FILES + 1;
+        printf("[KVS Master] sendVideoPackets(): fileIndex: %d \n", fileIndex);
+#ifdef USE_SD_CARD
         snprintf(filePath, MAX_PATH_LEN, "/sdcard/h264SampleFrames/frame-%04d.h264", fileIndex);
-
+        // Need to read the frame data and get the size before we can actually read the file.
         CHK(readFrameFromDisk(NULL, &frameSize, filePath) == STATUS_SUCCESS, STATUS_MEDIA_VIDEO_SINK);
+#else
+        frameSize = frames_get_frame_length(fileIndex);
+#endif
 
         // Re-alloc if needed
         if (frameSize > pCodecStreamConf->frameBufferSize) {
+            printf("[KVS Master] re-allocating frame buffer to %d bytes \n", frameSize);
             CHK((pCodecStreamConf->pFrameBuffer = (UINT8*) MEMREALLOC(pCodecStreamConf->pFrameBuffer, frameSize)) != NULL, STATUS_MEDIA_NOT_ENOUGH_MEMORY);
             pCodecStreamConf->frameBufferSize = frameSize;
         }
@@ -115,7 +127,21 @@ PVOID sendVideoPackets(PVOID args)
         frame.frameData = pCodecStreamConf->pFrameBuffer;
         frame.size = frameSize;
 
-        CHK(readFrameFromDisk(frame.frameData, &frameSize, filePath) == STATUS_SUCCESS, STATUS_MEDIA_VIDEO_SINK);
+#ifdef USE_SD_CARD
+        // Read the frame data
+        retStatus = readFrameFromDisk(frame.frameData, &frameSize, filePath);
+        if (STATUS_SUCCESS != retStatus) {
+            printf("[KVS Master] sendVideoPackets(): failed to read frame data, cleaning up.. \n");
+            goto CleanUp;
+        }
+#else
+        // Get the frame data
+        frame.frameData = frames_get_frame(fileIndex);
+        if (NULL == frame.frameData) {
+            printf("[KVS Master] sendVideoPackets(): failed to get frame data, cleaning up.. \n");
+            goto CleanUp;
+        }
+#endif
 
         frame.presentationTs += FILESRC_VIDEO_FRAME_DURATION;
         frame.trackId = DEFAULT_VIDEO_TRACK_ID;
@@ -168,7 +194,7 @@ PVOID sendAudioPackets(PVOID args)
     while (!ATOMIC_LOAD_BOOL(&pFileSrcContext->shutdownFileSrc)) {
         fileIndex = fileIndex % NUMBER_OF_OPUS_FRAME_FILES + 1;
         snprintf(filePath, MAX_PATH_LEN, "/sdcard/opusSampleFrames/sample-%03d.opus", fileIndex);
-        
+
         CHK(readFrameFromDisk(NULL, &frameSize, filePath) == STATUS_SUCCESS, STATUS_MEDIA_AUDIO_SINK);
         // Re-alloc if needed
         if (frameSize > pCodecStreamConf->frameBufferSize) {

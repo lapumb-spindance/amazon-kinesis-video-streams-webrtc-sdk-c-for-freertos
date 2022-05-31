@@ -177,8 +177,10 @@ void app_main(void)
     ESP_LOGI(TAG, "ESP_WIFI_MODE_STA");
     wifi_init_sta();
 
+#ifdef USE_SD_CARD
+    printf("Initializing SD card\n");
     // initialize the fatfs and sd card.
-    {   
+    {
         ESP_LOGI(TAG, "Initializing SD card");
 
     #ifndef USE_SPI_MODE
@@ -241,9 +243,10 @@ void app_main(void)
             return;
         }
         // Card has been initialized, print its properties
-        sdmmc_card_print_info(stdout, card);    
+        sdmmc_card_print_info(stdout, card);
     }
-
+#endif
+    printf("USE_SD_CARD not defined, using internal frames instead\n");
     // using ntp to acquire the current time.
     {
         initialize_sntp();
@@ -260,7 +263,7 @@ void app_main(void)
         time(&now);
         localtime_r(&now, &timeinfo);
     }
-    {        
+    {
         uint32_t freeSize = esp_get_free_heap_size();
         printf("The available size of heap:%d\n", freeSize);
     }
@@ -279,7 +282,7 @@ void app_main(void)
     setenv("AWS_IOT_CORE_ROLE_ALIAS", CONFIG_AWS_IOT_CORE_ROLE_ALIAS, 1);
     setenv("AWS_IOT_CORE_THING_NAME", CONFIG)AWS_IOT_CORE_THING_NAME, 1);
     #endif
-    
+
     WebRTCAppMain(&gAppMediaSrc);
 
     // All done, unmount partition and disable SDMMC or SPI peripheral
