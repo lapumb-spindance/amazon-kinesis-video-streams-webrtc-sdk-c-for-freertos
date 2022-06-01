@@ -156,7 +156,9 @@ static STATUS app_common_onSignalingClientError(UINT64 userData, STATUS status, 
 static VOID app_common_onBandwidthEstimation(UINT64 userData, DOUBLE maxiumBitrate)
 {
     UNUSED_PARAM(userData);
-    DLOGV("received bitrate suggestion: %f", maxiumBitrate);
+    printf("============================================================\n");
+    printf("received bitrate suggestion: %f\n", maxiumBitrate);
+    printf("\n============================================================\n");
 }
 
 static VOID app_common_onSenderBandwidthEstimation(UINT64 userData, UINT32 txBytes, UINT32 rxBytes, UINT32 txPacketsCnt, UINT32 rxPacketsCnt,
@@ -178,7 +180,7 @@ static VOID app_common_onSenderBandwidthEstimation(UINT64 userData, UINT32 txByt
     }
     // otherwise keep bitrate the same
 
-    DLOGS("received sender bitrate estimation: suggested bitrate %u sent: %u bytes %u packets received: %u bytes %u packets in %lu msec, ", bitrate,
+    printf("received sender bitrate estimation: suggested bitrate %u sent: %u bytes %u packets received: %u bytes %u packets in %llu msec, \n", bitrate,
           txBytes, txPacketsCnt, rxBytes, rxPacketsCnt, duration / 10000ULL);
 }
 

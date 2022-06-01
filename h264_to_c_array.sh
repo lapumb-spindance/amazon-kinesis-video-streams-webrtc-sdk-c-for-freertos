@@ -42,7 +42,7 @@ rm -f $FRAMES_INCLUDE_FILE--
 echo "Generated $FRAME_COUNT frames in $FRAMES_INCLUDE_FILE"
 
 # ================================================================
-# Generate the frames source file file
+# Generate the frames source file
 # ================================================================
 FRAME_SOURCE_FILE=$OUTPUT_FILES_DIR/frames.c
 echo "#include \"frames.h\"
